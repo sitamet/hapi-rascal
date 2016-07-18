@@ -1,0 +1,40 @@
+{
+  "name": "hapi-rascal",
+  "version": "1.0.0",
+  "description": "Hapi plugin version of Rascal, a config driven wrapper around amqplib",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sitamet/hapi-rascal.git"
+  },
+  "keywords": [
+    "Hapi.js",
+    "Hapi",
+    "amqplib",
+    "amqp",
+    "rabbitmq"
+  ],
+  "author": {
+    "name": "@sitamet",
+    "email": "vega.joan@gmail.com"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sitamet/hapi-rascal/issues"
+  },
+  "homepage": "https://github.com/sitamet/hapi-rascal",
+  "dependencies": {
+    "rascal": "^0.15.0",
+    "hapi": "^13.4.2"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  },
+  "engines": {
+    "node": ">=4.2.3"
+  },
+  "scripts": {
+    "test": "./node_modules/jasmine-node/bin/jasmine-node --captureExceptions --forceexit --color test",
+    "rabbitmq": "docker run -d -p 5672:5672 -p 15672:15672 dockerfile/rabbitmq"
+  }
+}

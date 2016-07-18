@@ -1,0 +1,13 @@
+*.log
+*.out
+*.pid
+*.seed
+*.tgz
+*.xml
+.DS_Store
+.idea
+.project
+.strong-pm
+.tmp
+node_modules
+npm-debug.log
