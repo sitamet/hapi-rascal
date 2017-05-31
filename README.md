@@ -13,7 +13,7 @@ With a Rascal config, [read more](https://github.com/guidesmiths/rascal)
 
 ```javascript
 
-        var options = {
+        let options = {
             'vhosts': {
                 '/': {
 
@@ -75,7 +75,7 @@ With a Rascal config, [read more](https://github.com/guidesmiths/rascal)
 Once you register the hapi-rascal plugin
 
 ```javascript
-server.register({ register: 'hapi-rascal'), options: options });
+server.register({ register: 'hapi-rascal', options: options });
 ```
 
 you get a broker object you can consume:

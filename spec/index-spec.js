@@ -1,18 +1,20 @@
-var Hapi = require('hapi');
+'use strict';
 
-describe("hapi-rascal", function () {
+let Hapi = require('hapi');
 
-    var server;
+describe("hapi-rascal", () => {
 
-    it("shoud start our server registering the plugin", function (done) {
-        var options = {
+    let server;
+
+    beforeAll(done => {
+        let options = {
             'vhosts': {
                 '/': {
                     'namespace': true,
 
                     'connection': {
-                        hostname: process.env.WETOPI_RABBITMQ_HOST || 'localhost',
-                        port: 5679,
+                        hostname: process.env.WETOPI_RABBITMQ_HOST || 'rabbitmq',
+                        port: process.env.WETOPI_RABBITMQ_PORT_NODE || 5672,
                         user: process.env.WETOPI_RABBITMQ_DEFAULT_USER || 'guest',
                         password: process.env.WETOPI_RABBITMQ_DEFAULT_PASS || 'guest',
                         vhost: process.env.WETOPI_RABBITMQ_DEFAULT_VHOST || 'wetopi'
@@ -64,13 +66,17 @@ describe("hapi-rascal", function () {
 
         server = new Hapi.Server();
 
-        server.register({
-            register: require('../lib'),
-            options: options
-        }, function (err) {
+        server.on('log', event => console.log(event.data));
+
+
+        server.register([
+                            { register: require('../lib'), options: options }
+                        ], err => {
 
             expect(err).toBeFalsy();
+
             expect(server.plugins.rascal).toBeDefined();
+            expect(server.plugins.rascal.broker).toBeDefined("Check your rabbitmq connection options!");
 
             done();
 
@@ -78,38 +84,35 @@ describe("hapi-rascal", function () {
     });
 
 
-    it("should publish a message to foo and consume it", function (done) {
+    it("should publish a message to foo and consume it", done => {
 
-        var ourMessage = {
+        let ourMessage = {
             content: 'the foo message content attribute'
         };
 
-
-        server.plugins.rascal.broker.publish('foo', ourMessage, function(err) {
+        server.plugins.rascal.broker.publish('foo', ourMessage, err => {
 
             expect(err).toBeFalsy();
 
-            server.plugins.rascal.broker.subscribe('test', function(err, subscription) {
+            server.plugins.rascal.broker.subscribe('test', function (err, subscription) {
 
                 expect(err).toBeFalsy();
 
-                subscription.on('message', function(message, content, ackOrNack) {
+                subscription.on('message', function (message, content, ackOrNack) {
 
                     expect(content).toEqual(jasmine.objectContaining(ourMessage));
-
-                    console.log(content);
 
                     expect(message.properties.contentType).toBe('application/json');
                     ackOrNack();
 
-                    subscription.cancel(function(err) {
+                    subscription.cancel(err => {
                         expect(err).toBeFalsy();
                         done();
                     })
 
                 });
 
-            }).on('error', function(err) {
+            }).on('error', err => {
                 console.error('Subscriber error', err);
                 done();
             });
@@ -118,26 +121,26 @@ describe("hapi-rascal", function () {
     });
 
 
-    it("should publish to bar and consume it", function (done) {
+    it("should publish to bar and consume it", done => {
 
-        var ourMessage = 'the foo text message content';
+        let ourMessage = 'the foo text message content';
 
-        server.plugins.rascal.broker.publish('bar', ourMessage, function(err) {
+        server.plugins.rascal.broker.publish('bar', ourMessage, err => {
 
             expect(err).toBeFalsy();
 
-            server.plugins.rascal.broker.subscribe('test', function(err, subscription) {
+            server.plugins.rascal.broker.subscribe('test', function (err, subscription) {
 
                 expect(err).toBeFalsy();
 
-                subscription.on('message', function(message, content, ackOrNack) {
+                subscription.on('message', function (message, content, ackOrNack) {
 
                     expect(content).toEqual(ourMessage);
                     expect(message.properties.contentType).toBe('text/plain');
                     ackOrNack();
                     done();
 
-                }).on('error', function(err) {
+                }).on('error', err => {
                     console.error('Subscription error', err.message);
                     done();
                 });
@@ -149,8 +152,8 @@ describe("hapi-rascal", function () {
     });
 
 
-    it("shoud stop our server", function (done) {
-        server.stop(function(err) {
+    afterAll(done => {
+        server.stop(err => {
             expect(err).toBeFalsy();
             done();
         });
