@@ -13,72 +13,92 @@ With a Rascal config, [read more](https://github.com/guidesmiths/rascal)
 
 ```javascript
 
-        let options = {
-            'vhosts': {
-                '/': {
+let options = {
+    'vhosts': {
+        '/': {
 
-                    'connection': {
-                        hostname: 'localhost',
-                        port: 5672,
-                        user: process.env.WETOPI_RABBITMQ_DEFAULT_USER || 'guest',
-                        password: process.env.WETOPI_RABBITMQ_DEFAULT_PASS || 'guest'
-                    },
+            'connection': {
+                hostname: 'localhost',
+                port: 5672,
+                user: process.env.WETOPI_RABBITMQ_DEFAULT_USER || 'guest',
+                password: process.env.WETOPI_RABBITMQ_DEFAULT_PASS || 'guest'
+            },
 
-                    'exchanges': {
-                        testEx: {
-                            type: 'topic',
-                            options: {
-                                durable: true
-                            }
-                        }
-                    },
-
-                    'queues': {
-                        test: {
-                            options: {
-                                durable: true,
-                                exclusive: false
-                            }
-                        }
-                    },
-
-                    'bindings': [
-                        'testEx[a.test.#] -> test'
-                    ],
-
-                    'publications': {
-                        foo: {
-                            exchange: 'testEx',
-                            routingKey: 'a.test.foo'
-                        },
-                        bar: {
-                            exchange: 'testEx',
-                            routingKey: 'a.test.bar'
-                        }
-
-                    },
-
-                    'subscriptions': {
-                        test: {
-                            queue: 'test',
-                            contentType: 'application/json'
-                        }
+            'exchanges': {
+                testEx: {
+                    type: 'topic',
+                    options: {
+                        durable: true
                     }
+                }
+            },
 
+            'queues': {
+                test: {
+                    options: {
+                        durable: true,
+                        exclusive: false
+                    }
+                }
+            },
 
+            'bindings': [
+                'testEx[a.test.#] -> test'
+            ],
+
+            'publications': {
+                foo: {
+                    exchange: 'testEx',
+                    routingKey: 'a.test.foo'
+                },
+                bar: {
+                    exchange: 'testEx',
+                    routingKey: 'a.test.bar'
+                }
+
+            },
+
+            'subscriptions': {
+                test: {
+                    queue: 'test',
+                    contentType: 'application/json'
                 }
             }
-        };
+
+
+        }
+    }
+};
 ```
 
+Plus the option to add a driver:
 
-Once you register the hapi-rascal plugin
+```javascript
+
+let options = {
+    'vhosts': {...},
+    'drivers': [{
+        module: 'hapi-message-manager',
+        name: 'events',
+        options: {
+            publication: 'dom.obj.act.det'
+        }
+    }]
+};
+```
+
+e.g.  [hapi-message-manager](https://github.com/sitamet/hapi-message-manager)
+
+
+### Register the hapi-rascal plugin
 
 ```javascript
 server.register({ register: 'hapi-rascal', options: options });
 ```
 
-you get a broker object you can consume:
+### Consume the service:
+
+Once registered you get a broker object you can consume:
 
 ```javascript
 
@@ -104,7 +124,15 @@ server.plugins.rascal.broker.subscribe('test', function(err, subscription) {
     
 }).on('error', console.error);
 
+```
 
+### Consume the service through a driver:
+
+Following the driver in the example.
+The sample driver `publish` method gets exposed as:
+
+```javascript
+server.plugins.rascal.events.publish({ message }, 'domain-a.message.event.sample-event');
 ```
 
 
