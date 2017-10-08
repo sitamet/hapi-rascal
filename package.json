@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/sitamet/hapi-rascal",
   "dependencies": {
-    "rascal": "^1.1.0",
-    "hapi": "^16.3.0"
+    "hapi": "^16.6.2",
+    "rascal": "^2.3.2"
   },
   "devDependencies": {
     "jasmine": "2.4.1"
