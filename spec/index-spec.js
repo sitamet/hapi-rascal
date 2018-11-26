@@ -66,21 +66,24 @@ describe("hapi-rascal", () => {
 
         server = new Hapi.Server();
 
-        server.on('log', event => console.log(event.data));
+        server.events.on('log', event => console.log(event.data));
 
+        const start = async function () {
+            await server.register({ plugin: require('../lib'), options });
+            await server.start();
+        };
 
-        server.register([
-                            { register: require('../lib'), options: options }
-                        ], err => {
+        try {
+            start();
+        }
+        catch (err) {
+            server.log('error', err);
+        }
 
-            expect(err).toBeFalsy();
+        expect(server.plugins.rascal).toBeDefined();
+        expect(server.plugins.rascal.broker).toBeDefined("Check your rabbitmq connection options!");
 
-            expect(server.plugins.rascal).toBeDefined();
-            expect(server.plugins.rascal.broker).toBeDefined("Check your rabbitmq connection options!");
-
-            done();
-
-        });
+        done();
     });
 
 
@@ -152,10 +155,13 @@ describe("hapi-rascal", () => {
     });
 
 
-    afterAll(done => {
-        server.stop(err => {
-            expect(err).toBeFalsy();
+    afterAll( async (done) => {
+        try {
+            await server.stop();
             done();
-        });
+        }
+        catch (err) {
+            done.fail(err);
+        }
     });
 });
