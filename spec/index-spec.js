@@ -6,7 +6,7 @@ describe("hapi-rascal", () => {
 
     let server;
 
-    beforeAll(done => {
+    beforeAll(async (done) => {
         let options = {
             'vhosts': {
                 '/': {
@@ -35,7 +35,6 @@ describe("hapi-rascal", () => {
                         test: {
                             assert: true,
                             purge: true
-
                         }
                     },
 
@@ -70,20 +69,82 @@ describe("hapi-rascal", () => {
 
         const start = async function () {
             await server.register({ plugin: require('../lib'), options });
-            await server.start();
         };
 
         try {
-            start();
+            await start();
         }
         catch (err) {
             server.log('error', err);
         }
 
-        expect(server.plugins.rascal).toBeDefined();
+        expect(server.plugins).toBeDefined();
         expect(server.plugins.rascal.broker).toBeDefined("Check your rabbitmq connection options!");
 
         done();
+    });
+
+
+    it("should async publish a message to foo and consume it", async (done) => {
+
+        let ourMessage = {
+            content: 'the foo message content attribute'
+        };
+
+        try {
+            const subscription = await server.plugins.rascal.broker.subscribeAsync('test');
+
+            await server.plugins.rascal.broker.publishAsync('foo', ourMessage);
+
+            subscription.on('message', function (message, content, ackOrNack) {
+
+                expect(content).toEqual(jasmine.objectContaining(ourMessage));
+
+                expect(message.properties.contentType).toBe('application/json');
+                ackOrNack();
+
+                subscription.cancel(err => {
+                    expect(err).toBeFalsy();
+                    done();
+                })
+            });
+        }
+        catch (err) {
+            done.fail(err);
+        }
+
+    });
+
+
+    it("should async publish to bar and consume it", async (done) => {
+
+        let ourMessage = {
+            content: 'the bar text message content'
+        };
+
+
+        try {
+            const subscription = await server.plugins.rascal.broker.subscribeAsync('test');
+
+            await server.plugins.rascal.broker.publishAsync('bar', ourMessage);
+
+            subscription.on('message', function (message, content, ackOrNack) {
+
+                expect(content).toEqual(jasmine.objectContaining(ourMessage));
+
+                expect(message.properties.contentType).toBe('application/json');
+                ackOrNack();
+
+                subscription.cancel(err => {
+                    expect(err).toBeFalsy();
+                    done();
+                })
+            });
+        }
+        catch (err) {
+            done.fail(err);
+        }
+
     });
 
 
@@ -112,7 +173,6 @@ describe("hapi-rascal", () => {
                         expect(err).toBeFalsy();
                         done();
                     })
-
                 });
 
             }).on('error', err => {
@@ -124,39 +184,9 @@ describe("hapi-rascal", () => {
     });
 
 
-    it("should publish to bar and consume it", done => {
-
-        let ourMessage = 'the foo text message content';
-
-        server.plugins.rascal.broker.publish('bar', ourMessage, err => {
-
-            expect(err).toBeFalsy();
-
-            server.plugins.rascal.broker.subscribe('test', function (err, subscription) {
-
-                expect(err).toBeFalsy();
-
-                subscription.on('message', function (message, content, ackOrNack) {
-
-                    expect(content).toEqual(ourMessage);
-                    expect(message.properties.contentType).toBe('text/plain');
-                    ackOrNack();
-                    done();
-
-                }).on('error', err => {
-                    console.error('Subscription error', err.message);
-                    done();
-                });
-
-            });
-        });
-
-
-    });
-
-
-    afterAll( async (done) => {
+    afterAll(async (done) => {
         try {
+            await server.plugins.rascal.broker.nukeAsync();
             await server.stop();
             done();
         }
