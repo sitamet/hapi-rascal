@@ -1,4 +1,7 @@
 # Change Log
+## 3.0.1
+- throw when plugin registration fails
+
 ## 3.0.0
 ### Upgrade
 - Upgrade to run with hapijs v17

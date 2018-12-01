@@ -1,12 +1,14 @@
 'use strict';
 
+/* eslint-disable no-console */
+
 let Hapi = require('hapi');
 
-describe("hapi-rascal", () => {
+describe('hapi-rascal', () => {
 
     let server;
 
-    beforeAll(async (done) => {
+    beforeAll(async done => {
         let options = {
             'vhosts': {
                 '/': {
@@ -67,25 +69,26 @@ describe("hapi-rascal", () => {
 
         server.events.on('log', event => console.log(event.data));
 
-        const start = async function () {
-            await server.register({ plugin: require('../lib'), options });
-        };
 
         try {
+
+            const start = async () => {
+                await server.register({ plugin: require('../lib'), options });
+            };
+
             await start();
-        }
-        catch (err) {
-            server.log('error', err);
-        }
 
-        expect(server.plugins).toBeDefined();
-        expect(server.plugins.rascal.broker).toBeDefined("Check your rabbitmq connection options!");
+            expect(server.plugins).toBeDefined();
+            expect(server.plugins.rascal.broker).toBeDefined('Check your rabbitmq connection options!');
+            done();
 
-        done();
+        } catch (err) {
+            done.fail(err);
+        }
     });
 
 
-    it("should async publish a message to foo and consume it", async (done) => {
+    it('should async publish a message to foo and consume it', async done => {
 
         let ourMessage = {
             content: 'the foo message content attribute'
@@ -96,7 +99,7 @@ describe("hapi-rascal", () => {
 
             await server.plugins.rascal.broker.publishAsync('foo', ourMessage);
 
-            subscription.on('message', function (message, content, ackOrNack) {
+            subscription.on('message', (message, content, ackOrNack) => {
 
                 expect(content).toEqual(jasmine.objectContaining(ourMessage));
 
@@ -108,15 +111,14 @@ describe("hapi-rascal", () => {
                     done();
                 })
             });
-        }
-        catch (err) {
+        } catch (err) {
             done.fail(err);
         }
 
     });
 
 
-    it("should async publish to bar and consume it", async (done) => {
+    it('should async publish to bar and consume it', async done => {
 
         let ourMessage = {
             content: 'the bar text message content'
@@ -128,7 +130,7 @@ describe("hapi-rascal", () => {
 
             await server.plugins.rascal.broker.publishAsync('bar', ourMessage);
 
-            subscription.on('message', function (message, content, ackOrNack) {
+            subscription.on('message', (message, content, ackOrNack) => {
 
                 expect(content).toEqual(jasmine.objectContaining(ourMessage));
 
@@ -140,15 +142,14 @@ describe("hapi-rascal", () => {
                     done();
                 })
             });
-        }
-        catch (err) {
+        } catch (err) {
             done.fail(err);
         }
 
     });
 
 
-    it("should publish a message to foo and consume it", done => {
+    it('should publish a message to foo and consume it', done => {
 
         let ourMessage = {
             content: 'the foo message content attribute'
@@ -158,11 +159,11 @@ describe("hapi-rascal", () => {
 
             expect(err).toBeFalsy();
 
-            server.plugins.rascal.broker.subscribe('test', function (err, subscription) {
+            server.plugins.rascal.broker.subscribe('test', (err, subscription) => {
 
                 expect(err).toBeFalsy();
 
-                subscription.on('message', function (message, content, ackOrNack) {
+                subscription.on('message', (message, content, ackOrNack) => {
 
                     expect(content).toEqual(jasmine.objectContaining(ourMessage));
 
@@ -184,13 +185,12 @@ describe("hapi-rascal", () => {
     });
 
 
-    afterAll(async (done) => {
+    afterAll(async done => {
         try {
             await server.plugins.rascal.broker.nukeAsync();
             await server.stop();
             done();
-        }
-        catch (err) {
+        } catch (err) {
             done.fail(err);
         }
     });

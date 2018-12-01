@@ -1,6 +1,6 @@
 {
   "name": "hapi-rascal",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Hapi plugin version of Rascal, a config driven wrapper around amqplib",
   "main": "lib/index.js",
   "repository": {
@@ -28,6 +28,8 @@
     "rascal": "^3.2.2"
   },
   "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-plugin-jasmine": "^2.9.3",
     "jasmine": "^3.3.0"
   },
   "engines": {
