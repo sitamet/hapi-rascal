@@ -1,4 +1,7 @@
 # Change Log
+## 3.0.2
+- upgraded all dependencies.
+
 ## 3.0.1
 - throw when plugin registration fails
 
