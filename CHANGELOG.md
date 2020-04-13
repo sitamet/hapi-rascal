@@ -1,4 +1,8 @@
 # Change Log
+
+## 3.0.4
+- upgraded dependencies.
+
 ## 3.0.3
 - upgraded dependencies.
 

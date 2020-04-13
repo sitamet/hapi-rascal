@@ -1,6 +1,6 @@
 {
   "name": "hapi-rascal",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Hapi plugin version of Rascal, a config driven wrapper around amqplib",
   "main": "lib/index.js",
   "repository": {
@@ -24,14 +24,14 @@
   },
   "homepage": "https://github.com/sitamet/hapi-rascal",
   "dependencies": {
-    "amqplib": "^0.5.3",
-    "hapi": "^17.8.5",
-    "rascal": "^4.5.0"
+    "amqplib": "^0.5.5",
+    "@hapi/hapi": "^17.8.3",
+    "rascal": "^4.7.0"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
+    "eslint": "^6.8.0",
     "eslint-plugin-jasmine": "^2.9.3",
-    "jasmine": "^3.4.0"
+    "jasmine": "^3.5.0"
   },
   "engines": {
     "node": ">=8.11.3"

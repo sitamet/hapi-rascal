@@ -2,7 +2,7 @@
 
 /* eslint-disable no-console */
 
-let Hapi = require('hapi');
+let Hapi = require('@hapi/hapi');
 
 describe('hapi-rascal', () => {
 
