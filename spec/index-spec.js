@@ -6,6 +6,8 @@ let Hapi = require('@hapi/hapi');
 
 describe('hapi-rascal', () => {
 
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 15000;
+
     let server;
 
     beforeAll(async done => {
@@ -80,6 +82,7 @@ describe('hapi-rascal', () => {
 
             expect(server.plugins).toBeDefined();
             expect(server.plugins.rascal.broker).toBeDefined('Check your rabbitmq connection options!');
+
             done();
 
         } catch (err) {
@@ -95,9 +98,11 @@ describe('hapi-rascal', () => {
         };
 
         try {
-            const subscription = await server.plugins.rascal.broker.subscribeAsync('test');
+            const subscription = await server.plugins.rascal.broker.subscribe('test');
 
-            await server.plugins.rascal.broker.publishAsync('foo', ourMessage);
+            const publication = await server.plugins.rascal.broker.publish('foo', ourMessage);
+            publication.on('error', err => done.fail(err));
+
 
             subscription.on('message', (message, content, ackOrNack) => {
 
@@ -106,11 +111,11 @@ describe('hapi-rascal', () => {
                 expect(message.properties.contentType).toBe('application/json');
                 ackOrNack();
 
-                subscription.cancel(err => {
-                    expect(err).toBeFalsy();
-                    done();
-                })
-            });
+                subscription.cancel();
+                done();
+
+            }).on('error', err => done.fail(err));
+
         } catch (err) {
             done.fail(err);
         }
@@ -126,9 +131,9 @@ describe('hapi-rascal', () => {
 
 
         try {
-            const subscription = await server.plugins.rascal.broker.subscribeAsync('test');
+            const subscription = await server.plugins.rascal.broker.subscribe('test');
 
-            await server.plugins.rascal.broker.publishAsync('bar', ourMessage);
+            await server.plugins.rascal.broker.publish('bar', ourMessage);
 
             subscription.on('message', (message, content, ackOrNack) => {
 
@@ -137,10 +142,9 @@ describe('hapi-rascal', () => {
                 expect(message.properties.contentType).toBe('application/json');
                 ackOrNack();
 
-                subscription.cancel(err => {
-                    expect(err).toBeFalsy();
-                    done();
-                })
+                subscription.cancel();
+                done();
+
             });
         } catch (err) {
             done.fail(err);
@@ -149,45 +153,9 @@ describe('hapi-rascal', () => {
     });
 
 
-    it('should publish a message to foo and consume it', done => {
-
-        let ourMessage = {
-            content: 'the foo message content attribute'
-        };
-
-        server.plugins.rascal.broker.publish('foo', ourMessage, err => {
-
-            expect(err).toBeFalsy();
-
-            server.plugins.rascal.broker.subscribe('test', (err, subscription) => {
-
-                expect(err).toBeFalsy();
-
-                subscription.on('message', (message, content, ackOrNack) => {
-
-                    expect(content).toEqual(jasmine.objectContaining(ourMessage));
-
-                    expect(message.properties.contentType).toBe('application/json');
-                    ackOrNack();
-
-                    subscription.cancel(err => {
-                        expect(err).toBeFalsy();
-                        done();
-                    })
-                });
-
-            }).on('error', err => {
-                console.error('Subscriber error', err);
-                done();
-            });
-        });
-
-    });
-
-
     afterAll(async done => {
         try {
-            await server.plugins.rascal.broker.nukeAsync();
+            await server.plugins.rascal.broker.nuke();
             await server.stop();
             done();
         } catch (err) {

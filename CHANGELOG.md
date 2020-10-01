@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.0
+- Upgraded dependencies.
+- Upgrade to run with hapijs v19
+- New async broker functions
+
 ## 3.0.4
 - upgraded dependencies.
 
@@ -15,7 +20,7 @@
 ## 3.0.0
 ### Upgrade
 - Upgrade to run with hapijs v17
-- Async broker functions: broker.publishAsync, broker.subscribeAsync, broker.nukeAsync,
+- Async broker functions: broker.publish, broker.subscribe, broker.nukeAsync,
 - Upgrade all dependencies
 
 
