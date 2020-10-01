@@ -132,7 +132,7 @@ Following the driver in the example.
 The sample driver `publish` method gets exposed as:
 
 ```javascript
-server.plugins.rascal.events.publish({ message }, 'domain-a.message.event.sample-event');
+server.plugins.rascal.broker.publish({ message }, 'domain-a.message.event.sample-event');
 ```
 
 
