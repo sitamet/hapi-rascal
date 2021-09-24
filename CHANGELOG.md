@@ -1,5 +1,8 @@
 # Change Log
 
+## 4.0.1
+- Upgraded dependencies.
+
 ## 4.0.0
 - Upgraded dependencies.
 - Upgrade to run with hapijs v19
