@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.3
+- Upgraded hapi to 21.3.2
+- Upgraded rascal to 16.3.0
+- Better async tests
+
 ## 4.0.2
 ## 4.0.1
 - Upgraded dependencies.

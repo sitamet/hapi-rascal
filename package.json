@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/sitamet/hapi-rascal",
   "dependencies": {
-    "@hapi/hapi": "^19.2.0",
+    "@hapi/hapi": "^21.3.2",
     "amqplib": "^0.10.3",
     "rascal": "^16.3.0"
   },

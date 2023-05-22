@@ -10,7 +10,7 @@ describe('hapi-rascal', () => {
 
     let server;
 
-    beforeAll(async done => {
+    beforeAll(async () => {
         let options = {
             'vhosts': {
                 '/': {
@@ -83,83 +83,69 @@ describe('hapi-rascal', () => {
             expect(server.plugins).toBeDefined();
             expect(server.plugins.rascal.broker).toBeDefined('Check your rabbitmq connection options!');
 
-            done();
-
         } catch (err) {
-            done.fail(err);
+            fail(err);
         }
     });
 
 
-    it('should async publish a message to foo and consume it', async done => {
+    it('should async publish a message to foo and consume it', async () => {
 
         let ourMessage = {
             content: 'the foo message content attribute'
         };
 
-        try {
-            const subscription = await server.plugins.rascal.broker.subscribe('test');
+        const subscription = await server.plugins.rascal.broker.subscribe('test');
 
-            const publication = await server.plugins.rascal.broker.publish('foo', ourMessage);
-            publication.on('error', err => done.fail(err));
+        const publication = await server.plugins.rascal.broker.publish('foo', ourMessage);
+        publication.on('error', err => {
+            throw err;
+        });
 
-
+        await new Promise((resolve, reject) => {
             subscription.on('message', (message, content, ackOrNack) => {
-
-                expect(content).toEqual(jasmine.objectContaining(ourMessage));
-
-                expect(message.properties.contentType).toBe('application/json');
-                ackOrNack();
-
-                subscription.cancel();
-                done();
-
-            }).on('error', err => done.fail(err));
-
-        } catch (err) {
-            done.fail(err);
-        }
-
+                try {
+                    expect(content).toEqual(jasmine.objectContaining(ourMessage));
+                    expect(message.properties.contentType).toBe('application/json');
+                    ackOrNack();
+                    subscription.cancel();
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            }).on('error', reject);
+        });
     });
 
 
-    it('should async publish to bar and consume it', async done => {
+    it('should async publish to bar and consume it', async () => {
 
         let ourMessage = {
             content: 'the bar text message content'
         };
 
+        const subscription = await server.plugins.rascal.broker.subscribe('test');
 
-        try {
-            const subscription = await server.plugins.rascal.broker.subscribe('test');
+        await server.plugins.rascal.broker.publish('bar', ourMessage);
 
-            await server.plugins.rascal.broker.publish('bar', ourMessage);
-
+        await new Promise((resolve, reject) => {
             subscription.on('message', (message, content, ackOrNack) => {
-
-                expect(content).toEqual(jasmine.objectContaining(ourMessage));
-
-                expect(message.properties.contentType).toBe('application/json');
-                ackOrNack();
-
-                subscription.cancel();
-                done();
-
-            });
-        } catch (err) {
-            done.fail(err);
-        }
-
+                try {
+                    expect(content).toEqual(jasmine.objectContaining(ourMessage));
+                    expect(message.properties.contentType).toBe('application/json');
+                    ackOrNack();
+                    subscription.cancel();
+                    resolve();
+                } catch (err) {
+                    reject(err);
+                }
+            }).on('error', reject);
+        });
     });
 
 
-    afterAll(async done => {
-        try {
-            await server.plugins.rascal.broker.nuke();
-            await server.stop();
-            done();
-        } catch (err) {
-            done.fail(err);
-        }
+    afterAll(async () => {
+        await server.plugins.rascal.broker.nuke();
+        await server.stop();
     });
 });
