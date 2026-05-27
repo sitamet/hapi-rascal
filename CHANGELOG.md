@@ -1,4 +1,9 @@
 # Change Log
+## 4.0.5
+
+- Upgraded dependencies.
+## 4.0.4
+- Upgraded dependencies.
 
 ## 4.0.3
 - Upgraded hapi to 21.3.2
