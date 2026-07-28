@@ -26,7 +26,7 @@
   "dependencies": {
     "@hapi/hapi": "^21.3.12",
     "amqplib": "^0.10.9",
-    "rascal": "^19.0.0"
+    "rascal": "^21.0.1"
   },
   "devDependencies": {
     "eslint": "^9.1.1",
