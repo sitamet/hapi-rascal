@@ -29,9 +29,9 @@
     "rascal": "^19.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.1.1",
+    "eslint": "^10.8.0",
     "eslint-plugin-jasmine": "^4.1.3",
-    "jasmine": "^5.1.0"
+    "jasmine": "^6.3.0"
   },
   "engines": {
     "node": ">=8.11.3"
